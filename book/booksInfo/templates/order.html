@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>订单</title>
+</head>
+<body>
+    <h2>选择收获地址</h2>
+    {% for add in address %}
+        <p><input type="radio" name="1" _add="{{ add.address }}"
+        _addname="{{ add.adname }}" _addphone="{{ add.adphone }}">
+        收件地址:{{ add.address }}
+        收件人:{{ add.adname }}
+        联系电话：{{ add.adphone }}</p>
+    {% endfor %}
+    <h2>购买商品</h2>
+    <div id="show"></div>
+    <br>
+    合计：<div id="num" ></div>
+    <br>
+    <button onclick="corder()">确认订单</button>
+    <a href="/"><button>返回首页</button></a>
+{#    <input type="button" src="/" value="返回首页">#}
+
+{#    sessionStorage.setItem('acot',JSON.stringify(carts));#}
+    <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+    <script>
+{#        console.log(JSON.parse(sessionStorage.getItem('acot')));#}
+{#        console.log(sessionStorage.getItem('acot'));#}
+{#        var orderinfor = console.log(sessionStorage.getItem('acot'));#}
+{#        console.log(orderinfor)#}
+{#        var newinfo = orderinfor.split(",");#}
+{#        console.log(newinfo)#}
+
+        var cals = JSON.parse(sessionStorage.getItem('acot'));
+        var s='';
+        var arr=[];
+        $.each(cals,function (index,obj) {
+                var n = null
+                s=s+"书名： "+obj.name+" 价格: "+obj.price+" 数量: "+obj.count+"<br>";
+                n = Number(obj.price)*Number(obj.count);
+                arr.push(n);
+            }
+        );
+        $('#show').append(s);
+        var a=0;
+        for (var i=0;i<arr.length;i++){
+            a = a+arr[i];
+        };
+{#            console.log(a)#}
+        var acot = arr.length
+        $('#num').text(a);
+{#            console.log($("#num").text());#}
+{#            console.log(acot);#}
+        $("#num").attr("_acot",acot);
+        $("#num").attr("_count",a);
+
+{#        console.log($("#num").attr("_acot"));#}
+{#        console.log($("#num").attr("_count"));#}
+        function corder(){
+            $.ajax({
+              url: "/cartinfo/corder/",
+              data: {
+                  "adsname": $('input:radio:checked').attr('_addname'),
+                  "adsphone": $('input:radio:checked').attr('_addphone'),
+                  "adsaddress": $('input:radio:checked').attr('_add'),
+                  "acot": $("#num").attr("_acot"),
+                  'orderacount': $("#num").attr("_count"),
+                  "detail": sessionStorage.getItem('acot'),
+                  "csrfmiddlewaretoken":'{{ csrf_token }}',
+              },
+              datatype: "json",
+              type: "post",
+              success: function (data) {
+                  if (JSON.parse(data).message == "ok") {
+                      alert("下单成功")
+                  }
+
+              },
+              error: function (error) {
+                  console.log(error);
+              },
+            });
+        };
+    </script>
+</body>
+</html>

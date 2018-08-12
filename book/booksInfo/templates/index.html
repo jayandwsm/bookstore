@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html class="no-js">
+	<head>
+        {% load static %}
+		<meta charset="utf-8">
+		<title></title>
+		<!-- Animate.css -->
+		<link rel="stylesheet" href="{% static 'css/animate.css' %}">
+		<!-- Icomoon Icon Fonts-->
+		<link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
+		<!-- Bootstrap  -->
+		<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+		<!-- Superfish -->
+{#		<link rel="stylesheet" href="css/superfish.css">#}
+{#		<!-- Flexslider  -->#}
+{#		<link rel="stylesheet" href="css/flexslider.css">#}
+
+		<link rel="stylesheet" href="{% static 'css/style1.css' %}">
+
+		<!-- Modernizr JS -->
+{#		<script src="js/modernizr-2.6.2.min.js"></script>#}
+
+	</head>
+	<body>
+        {% if request.session.username %}
+            welcome,{{ request.session.username }}
+            <a href="{% url 'logout' %}">退出</a>
+        {% else %}
+            <a href="{% url 'login' %}">登录</a>
+            <a href="{% url 'regist' %}">注册</a>
+        {% endif %}
+		<header id="fh5co-header" role="banner">
+			<div class="container text-center">
+				<div id="fh5co-logo">
+					<img src="/static/images/books/logo.png" >
+				</div>
+				<nav>
+					<ul>
+						<li><a href="{% url 'person' %}">个人信息</a></li>
+						<li><a href="{% url 'index' %}">主页</a></li>
+						<li><a href="{% url 'cart' %}">购物车</a></li>
+						<li><a href="#">我的收藏</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<div class="container-fluid pt70 pb70">
+			<div id="fh5co-projects-feed" class="fh5co-projects-feed clearfix masonry">
+				{% for book in all_books %}
+                    <div class="fh5co-project masonry-brick">
+                        <a href="{{ book.get_url }}">
+                            <img src="{{ book.bookpicture }}" alt="">
+                            <h2>{{ book.bookname }}</h2>
+
+                        </a>
+                    </div>
+                {% endfor %}
+			</div>
+			<!--END .fh5co-projects-feed-->
+		</div>
+{#        <script src="{% static 'js/jquery-1.11.3.js' %}"></script>#}
+{#        <script>#}
+{#            function showdetail(bookid){#}
+{#                $.ajax({#}
+{#                    url:"/detail/",#}
+{#                    data:{"bookid":bookid,"csrfmiddlewaretoken":"{{ csrf_token }}"},#}
+{#                    datatype:"json",#}
+{#                    type:"get",#}
+{#                    success:function (data) {#}
+{#                        console.log(data)#}
+{#                    },#}
+{#                    error:function (error) {#}
+{#                        console.log(error)#}
+{#                    },#}
+{#                });#}
+{#            }#}
+{#        </script>#}
+{#	<!-- jQuery -->#}
+{#	<script src="{% static 'js/jquery.min.js' %}"></script>#}
+{#	<!-- Bootstrap -->#}
+{#	<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
+{#	<!-- masonry -->#}
+{#	<script src="{% static 'js/jquery.masonry.min.js' %}"></script>#}
+{#	<!-- MAIN JS -->#}
+{#	<script src="{% static 'js/main.js' %}"></script>#}
+
+	</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+ <head>
+     {% load static %}
+  <meta charset="UTF-8">
+  <title>购物车</title>
+  <style>
+	#ta1{
+		width:990px;
+		font-size:25px;
+		color:#9c9a9c;
+		text-align:center;
+		border-bottom:1px solid #9c9a9c;
+		padding-bottom:5px;
+	}
+	#ta1 td{
+		border-bottom:1px dashed #9c9a9c;
+
+	}
+
+	#ta1 a{
+		color:#005aa0;
+		text-decoration:none;
+	}
+	#tr1{
+		width:610px;
+		color:#666;
+		font-weight:bold;
+	}
+	#ta1 thead td{
+		border-bottom:1px solid #9c9a9c;
+		padding-bottom:5px;
+	}
+	#ta1 body td{
+		padding-bottom:5px;
+	}
+	#tl{
+		text-align:left;
+	}
+  </style>
+ </head>
+ <body>
+  <table id="ta1">
+	<thead>
+		<tr id="tr1">
+			<td id="tl">书</td>
+			<td>价格</td>
+			<td>数量</td>
+			<td>是否购买</td>
+		</tr>
+	</thead>
+	<tbody>
+        {% for cart in carts%}
+            <tr>
+                <td id="tl">{{ cart.book.bookname }}</td>
+                <td>{{ cart.book.bookprice }}</td>
+                <td>
+                    <input name="count" type="text" value="{{ cart.ccount }}">
+                </td>
+                <td ><input type="checkbox" _bn="{{ cart.book.bookname }}" _bp="{{ cart.book.bookprice }}"
+                _bc="{{ cart.ccount }}" _bi="{{ cart.book.id }}"></td>
+                <td><button onclick="delbook({{ cart.book.id }})">删除</button></td>
+            </tr>
+        {% endfor %}
+	</tbody>
+
+  </table>
+  <br>
+  <button style="margin-left: 900px" onclick="addorder()">下订单</button>
+  <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+  <script>
+      function delbook(bookid) {
+          console.log(bookid)
+          $.ajax({
+              url: "/cartinfo/delbook/",
+              data: {"bookid": bookid, "csrfmiddlewaretoken": "{{ csrf_token }}"},
+              datatype: "json",
+              type: "get",
+              success: function (data) {
+                  if (JSON.parse(data).message == "ok") {
+                      location.href = "/cartinfo/cart/";
+                  }
+              },
+              error: function (error) {
+                  console.log(error)
+              },
+          });
+      };
+      function addorder() {
+        var carts=[];
+        $.each($('input:checkbox:checked'),function () {
+                var cartg = {};
+                cartg['id']=$(this).attr('_bi');
+                cartg['name']=$(this).attr('_bn');
+                cartg['price']=$(this).attr('_bp');
+                cartg['count']=$(this).attr("_bc");
+                carts.push(cartg);
+            }
+        );
+        console.log(carts);
+        sessionStorage.setItem('acot',JSON.stringify(carts));
+{#        localStorage#}
+        location.href='/cartinfo/order';
+    };
+
+{#      $(function(){#}
+{#          var ts = new Date().getTime();#}
+{#          $('input[name="count"]').each(function () {#}
+{#          $(this).prev().html(ts-parseInt(this.value));#}
+{#        });#}
+{#            var count = $("input[name='count']");#}
+{#            count.blur(function() {#}
+{#                var ccount = count.val();#}
+{#                console.log(ccount);#}
+{#            });#}
+{#      });#}
+
+  </script>
+ </body>
+</html>

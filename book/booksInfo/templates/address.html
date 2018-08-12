@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>地址信息</title>
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+		<!-- Icomoon Icon Fonts-->
+		<link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
+		<!-- Bootstrap  -->
+		<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+		<!-- Superfish -->
+{#		<link rel="stylesheet" href="css/superfish.css">#}
+{#		<!-- Flexslider  -->#}
+{#		<link rel="stylesheet" href="css/flexslider.css">#}
+
+		<link rel="stylesheet" href="{% static 'css/style1.css' %}">
+    <style>
+        div{
+            width: 300px;
+            height: 40px;
+        }
+        table{
+            margin-right: 50px;
+        }
+    </style>
+</head>
+<body>
+    <table width="1000px" height="20px" cellspacing="10px">
+        <thead>
+            <tr>
+                <td>收件人</td>
+                <td>收件地址</td>
+                <td>联系电话</td>
+                <td>是否删除</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for add in address %}
+                <tr id="{{ add.id }}" _ap="123">
+                    <td><input id = "i1" type="text" value="{{ add.adname }}"></td>
+                    <td><input id = "i2" type="text" value="{{ add.address }}"></td>
+                    <td><input id = "i3" type="text" value="{{ add.adphone }}"></td>
+                    <td><button onclick="del({{ add.id }})">删除</button></td>
+                    <td><button onclick="change({{ add.id }})">修改</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form action="{% url 'add_address' %}" method="post">
+        {% csrf_token %}
+        收件人：<input type="text" name="addressname"><br>
+        收件地址：<input type="text" name="address"><br>
+        联系电话：<input type="text" name="addressphone"><br>
+        <input type="submit" value="增加">
+    </form>
+    <span style="color:red;">{{ message }}</span>
+    <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+    <script>
+        function del(delid) {
+{#            console.log(delid)#}
+            $.ajax({
+                url:"/userinfo/del_address/",
+                data:{"delid":delid},
+                datatype:"json",
+                type:"get",
+                success:function (data) {
+                    location.href="/userinfo/show_address";
+                },
+                error:function (error) {
+
+                },
+            });
+        };
+        function change(changeid){
+
+            var name = $("#"+changeid+ " #i1").val();
+            var address = $("#"+changeid+ " #i2").val();
+            var phone = $("#"+changeid+ " #i3").val();
+{#            console.log(name)#}
+{#            console.log(address)#}
+{#            console.log(phone)#}
+            $.ajax({
+                url:"/userinfo/change_address/",
+                data:{"addressid":changeid,"name":name,"address":address,"phone":phone,
+                "csrfmiddlewaretoken":"{{ csrf_token }}"},
+                datatype:"json",
+                type:"POST",
+                success:function (data) {
+                    location.href="/userinfo/show_address";
+                },
+                error:function (error) {
+                    console.log(error)
+                },
+            });
+        }
+    </script>
+</body>
+</html>

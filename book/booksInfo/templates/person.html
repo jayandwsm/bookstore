@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>基本信息</title>
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+		<!-- Icomoon Icon Fonts-->
+		<link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
+		<!-- Bootstrap  -->
+		<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+		<!-- Superfish -->
+{#		<link rel="stylesheet" href="css/superfish.css">#}
+{#		<!-- Flexslider  -->#}
+{#		<link rel="stylesheet" href="css/flexslider.css">#}
+
+		<link rel="stylesheet" href="{% static 'css/style1.css' %}">
+</head>
+<body>
+    <h2 align="center">基本信息</h2>
+    <p>用户名:{{ old_user.username }}</p>
+    <p>手机号:{{ old_user.phone }}</p>
+    <p>邮箱:{{ old_user.email }}</p>
+    <h2>修改密码</h2>
+    <p>原始密码：<input type="password" name="old_password" placeholder="请输入旧密码" id="o_password"></p>
+    <p>修改密码：<input type="password" name="new_password" placeholder="请输入新密码" id="n_password"></p>
+    <p><button onclick="change()">确认修改</button></p>
+    <span id="span_name" style="color: red"></span>
+    <p><a href="{% url 'show_address' %}">地址信息</a></p>
+    <p><a href="{% url 'finish_order' %}">订单信息</a></p>
+
+    <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+    <script>
+        function change() {
+            var old_password = $("#o_password").val()
+            var new_password = $("#n_password").val()
+            console.log(old_password)
+            console.log(new_password)
+            $.ajax({
+                url:"/userinfo/change_p/",
+                data:{"old_password":old_password,"new_password":new_password,"csrfmiddlewaretoken":"{{ csrf_token }}"},
+                type:"post",
+                datatype:'json',
+                success:function (data) {
+                    if (JSON.parse(data).success=="success") {
+                        $("#span_name").text("修改成功");
+{#                        console.log("1")#}
+                    }else if(JSON.parse(data).fail=="fail"){
+                        $("#span_name").text("密码错误");
+{#                        console.log("2")#}
+                    }
+{#                    console.log(data);#}
+{##}
+{#                    console.log(JSON.parse(data).success);#}
+{#                    console.log(JSON.parse(data).fail);#}
+{#                    console.log(JSON.parse(data));#}
+
+                },
+                error:function(error){
+
+                },
+
+            });
+        };
+    </script>
+</body>
+</html>

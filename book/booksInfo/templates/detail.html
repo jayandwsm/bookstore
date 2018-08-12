@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>书城</title>
+</head>
+<body>
+    <table border="0" align="center">
+        <tr>
+            <td><img src="{% static d_book.bookpicture %}"></td>
+            <td>
+                <p style="margin-top: 0px">书名:{{ d_book.bookname }}</p>
+                <p>介绍:{{ d_book.bookdetail }}<br></p>
+                <p>描述:{{ d_book.bookdesc }}<br></p>
+                <p>价格:{{ d_book.bookprice }}<br></p>
+                <p>数量:<input  id="reduce" type="button" value="-">
+                        <input  id="num" type="text" value="1">
+                        <input  id="add" type="button" value="+">本</p>
+
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">{{ d_book.bookname }}</td>
+            <td style="text-align: center;"><button onclick="addcart({{ d_book.id }})">添加购物车</button></td>
+        </tr>
+    </table>
+    <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+    <script>
+        var i = $("#num").val();
+{#        console.log(i);#}
+        $("#add").click(function () {
+            i++;
+{#            console.log(i);#}
+            $("#num").val(i);
+        });
+        $("#reduce").click(function (){
+            i--;
+{#            console.log(i);#}
+            $("#num").val(i)
+            if (i < 1) {
+                $("#num").val(1);
+                 i = 1;
+                };
+        });
+        function addcart(bookid){
+{#            console.log(i)#}
+            $.ajax({
+                url:"/cartinfo/addcart/",
+                data:{"bookid":bookid,"bookunit":i,"csrfmiddlewaretoken":"{{ csrf_token }}"},
+                datatype:"json",
+                type:"post",
+                success:function (data) {
+                    if (JSON.parse(data)["message"]=="success"){
+{#                        console.log(JSON.parse(data)["message"])#}
+                        alert("添加成功")
+                    }else {
+                        document.write("商品已售完")
+                    }
+
+                },
+                error:function (error) {
+                    console.log(error)
+                },
+            });
+        };
+
+
+
+    </script>
+</body>
+</html>
