@@ -1,6 +1,9 @@
 from django.db import models
 
 # Create your models here.
+from booksInfo.models import Book
+
+
 class UserInfo(models.Model):
     username = models.CharField('用户名',max_length=50,null=False)
     password = models.CharField('密码',max_length=200,null=False)
@@ -21,3 +24,10 @@ class Address(models.Model):
 
     def __str__(self):
         return self.address
+
+class Save(models.Model):
+    user = models.ForeignKey(UserInfo,db_column="user_id",on_delete=models.CASCADE)
+    book = models.ForeignKey(Book,db_column="book_id",on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
