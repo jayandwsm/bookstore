@@ -1,16 +1,24 @@
 import json
 import logging
+import random
+import string
+import io
+import random
+
+from PIL import Image, ImageDraw, ImageFont
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 
 # Create your views here.
+from django.views.decorators.cache import cache_page
 from pymysql import DatabaseError
 from requests import session
 
+from booksInfo.models import Book
 from cartInfo.models import Order
-from userInfo.models import UserInfo, Address
+from userInfo.models import UserInfo, Address, Save
 
 
 def regist(request):
@@ -60,6 +68,56 @@ def regist_in(request):
     else:
         return redirect("/userinfo/regist")
 
+# 生成验证码
+def verify_code(request):
+    #引入随机函数模块
+
+    #定义变量，用于画面的背景色、宽、高
+    bgcolor = (random.randrange(20, 100), random.randrange(
+        20, 100), 255)
+    width = 100
+    height = 25
+    #创建画面对象
+    im = Image.new('RGB', (width, height), bgcolor)
+    #创建画笔对象
+    draw = ImageDraw.Draw(im)
+    #调用画笔的point()函数绘制噪点
+    for i in range(0, 100):
+        xy = (random.randrange(0, width), random.randrange(0, height))
+        fill = (random.randrange(0, 255), 255, random.randrange(0, 255))
+        draw.point(xy, fill=fill)
+    #定义验证码的备选值
+    str1 = string.digits+string.ascii_uppercase+string.ascii_lowercase
+    #随机选取4个值作为验证码
+    code = ''
+    for i in range(0, 4):
+        code += random.choice(str1)
+    #构造字体对象，ubuntu的字体路径为“/usr/share/fonts/truetype/freefont”
+    font = ImageFont.truetype('FreeMono.ttf', 23)
+    #构造字体颜色
+    fontcolor = (255, random.randrange(0, 255), random.randrange(0, 255))
+    #绘制4个字
+    draw.text((5, 2), code[0], font=font, fill=fontcolor)
+    draw.text((25, 2), code[1], font=font, fill=fontcolor)
+    draw.text((50, 2), code[2], font=font, fill=fontcolor)
+    draw.text((75, 2), code[3], font=font, fill=fontcolor)
+    #释放画笔
+    del draw
+    #存入session，用于做进一步验证
+    request.session['code'] = code
+    """
+    python2的为
+    # 内存文件操作
+    import cStringIO
+    buf = cStringIO.StringIO()
+    """
+    # 内存文件操作-->此方法为python3的
+
+    buf = io.BytesIO()
+    #将图片保存在内存中，文件类型为png
+    im.save(buf, 'png')
+    #将内存中的图片数据返回给客户端，MIME类型为图片png
+    return HttpResponse(buf.getvalue(), 'image/png')
 
 def login(request):
     return render(request, "regist_login.html")
@@ -72,11 +130,17 @@ def login_in(request):
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
+        codeN = request.POST.get("codeN")
+        # print(codeN)
+        code = request.session.get("code")
+        # print(code)
         # print(username)
         username_exist = UserInfo.objects.filter(username=username)
-        print(username_exist)
+        # print(username_exist)
         # print(username_exist[0].username)
         # print(username_exist[0].password)
+        if codeN.lower() != code.lower():
+            return render(request, "regist_login.html", {"message": "验证码错误"})
         if len(username_exist) <1:
             return render(request, "regist_login.html", {"message": "用户名或密码错误"})
         if check_password(password,username_exist[0].password):
@@ -88,9 +152,14 @@ def login_in(request):
     else:
         return redirect("/userinfo/login")
 
+
+
+
 def logout(request):
     try:
-        if request.session["username"] :
+        check_user = request.session.get("username")
+        print(check_user)
+        if check_user:
             del request.session["username"]
             del request.session["id"]
     except DatabaseError as e:
@@ -121,7 +190,7 @@ def add_address(request):
     addressname = request.POST.get("addressname")
     address = request.POST.get("address")
     addressphone = request.POST.get("addressphone")
-    print(address)
+    # print(address)
     if addressname and address and addressphone:
         user = UserInfo.objects.get(id=userid)
         new_address.adname = addressname
@@ -156,8 +225,49 @@ def change_address(request):
         logging.warning(e)
     return HttpResponse(json.dumps({"static":"ok"}))
 
+def add(request):
+    # 1.session可以获取用户
+    # 2.前端可以获取书
+    # 3.判断这个人是否有这本书，没有添加，有返回
+    # if not
+    # 1.获取前端传来的id
+    bookid = request.GET.get("bookid")
+    # 3.从session中获取用户id
+    # print(bookid)
+    userid = request.session.get("id")
+    if not userid:
+        return redirect("/userinfo/login")
+    else:
+    # 2.通过id查询商品
+        user = UserInfo.objects.get(id=userid)
+        book = Book.objects.get(id=bookid)
+        # 4.保存进数据库
+        #判断数据库这个人是否有这本书
+        s = Save.objects.filter(user_id=userid,book_id=bookid)
+        new_save = Save()
+        # check_book = s[0].objects.filter(book_id=bookid)
+        if len(s)>0:
+            return HttpResponse(json.dumps({"success": "again"}))
+        new_save.user = user
+        new_save.book = book
+        try:
+            new_save.save()
+        except DatabaseError as e:
+            logging.warning(e)
+        # 5.返回给ajax
+        return HttpResponse(json.dumps({"success":"suc"}))
+
+def save_book(request):
+    # 1.获取用户session中的id
+    userid = request.session.get("id")
+    save = Save.objects.filter(user_id=userid)
+    # 2.通过userid获取用户所有的书
+    #3.返回save页面
+    return render(request,"save.html",locals())
+
+@cache_page(30)
 def finish_order(request):
+    # print("hahahah")
     userid = request.session["id"]
     old_order = Order.objects.filter(user_id=userid)
-    print()
     return render(request,"finish_order.html",locals())

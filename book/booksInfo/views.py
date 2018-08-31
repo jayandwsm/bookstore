@@ -6,14 +6,15 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
 # Create your views here.
+from django.views.decorators.cache import cache_page
 from pymysql import DatabaseError
 
 from booksInfo.models import BookType, Book
 from cartInfo.models import Cart
 from userInfo.models import UserInfo
 
-
 def show_index(request):
+    # print('hahhah')
     # 1.查询全部分类
     # 2.查询对应分类的商品展示在页面
     try:
@@ -45,7 +46,7 @@ def change_password(request):
     # 4.错误返回密码有误
     old_password = request.POST.get("old_password")
     new_password = request.POST.get("new_password")
-    print(old_password)
+    # print(old_password)
     username = request.session["username"]
     old_user = UserInfo.objects.get(username = username)
     if check_password(old_password,old_user.password):

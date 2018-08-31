@@ -4,3 +4,4 @@ from django.contrib import admin
 from userInfo.models import *
 admin.site.register(UserInfo)
 admin.site.register(Address)
+admin.site.register(Save)

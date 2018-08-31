@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>收藏</title>
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+		<!-- Icomoon Icon Fonts-->
+		<link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
+		<!-- Bootstrap  -->
+		<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+		<!-- Superfish -->
+{#		<link rel="stylesheet" href="css/superfish.css">#}
+{#		<!-- Flexslider  -->#}
+{#		<link rel="stylesheet" href="css/flexslider.css">#}
+
+		<link rel="stylesheet" href="{% static 'css/style1.css' %}">
+</head>
+<body>
+    <h2>我的收藏夹</h2>
+    {% for s in save %}
+        <p align="center">{{ forloop.counter }}.<a href="{{ s.book.get_url }}">{{ s.book.bookname }}</a></p>
+    {% endfor %}
+</body>
+</html>

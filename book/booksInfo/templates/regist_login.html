@@ -9,7 +9,6 @@
 <body>
 
 	<h1>change</h1>
-
 	<div class="container w3layouts agileits">
 
 		<div class="login w3layouts agileits">
@@ -18,6 +17,8 @@
                 {% csrf_token %}
 				<input type="text" Name="username" placeholder="用户名" >
 				<input type="password" Name="password" placeholder="密码">
+                <img src="{% url 'verify_code' %}" onclick="change_pic(this)">
+                <input type="text" name="codeN" placeholder="验证码">
                 <div class="send-button w3layouts agileits">
                     <input type="submit" value="登 录">
 			    </div>
@@ -72,6 +73,14 @@
                 });
             });
         });
+        //点击图片换验证码
+        function change_pic(ths) {
+            //点击图片进行切换 给img加上一个点击事件  然后
+            // 然后去重新给这个src 来赋值  获取原来的再加上个?
+            //动态的去改变URL的地址
+            ths.src = ths.src + "?";
+        }
     </script>
+
 </body>
 </html>

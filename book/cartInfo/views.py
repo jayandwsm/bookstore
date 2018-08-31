@@ -59,7 +59,8 @@ def addcart(request):
             # try:
             #     new_cart.save()
             # except DatabaseError as e:
-            #     logging.warning(e)
+            #
+            # logging.warning(e)
             # return render(request, "detail.html", json.dumps({"message":"success"}))
             try:
                 if len(check_cart) <= 0:
@@ -94,7 +95,7 @@ def del_book(request):
     # 3.返回删除成功信息到前端
     # 4.前端重新加载页面
     bookid = request.GET.get("bookid")
-    print(bookid)
+    # print(bookid)
     del_cart = Cart.objects.filter(book_id=bookid)
     try:
         a = del_cart[0].delete()
