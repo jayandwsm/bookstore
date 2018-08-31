@@ -19,7 +19,30 @@
 <body>
     <h2>我的收藏夹</h2>
     {% for s in save %}
-        <p align="center">{{ forloop.counter }}.<a href="{{ s.book.get_url }}">{{ s.book.bookname }}</a></p>
+        <p align="center">
+            {{ forloop.counter }}.
+            <a href="{{ s.book.get_url }}">{{ s.book.bookname }}</a>
+            <button onclick="del_save({{ s.book.id }})">删除</button>
+        </p>
     {% endfor %}
+    <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+    <script>
+        function del_save(book_id) {
+            console.log(book_id)
+            $.ajax({
+                url:"/userinfo/del_save/",
+                data:{"book_id":book_id},
+                datatype:"json",
+                type:"get",
+                success:function (data) {
+                    location.href="/userinfo/save_book/"
+                },
+                error:function (error) {
+                    console.log(error)
+                }
+
+            });
+        }
+    </script>
 </body>
 </html>

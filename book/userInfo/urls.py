@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^finish_order/',views.finish_order,name="finish_order"),
     url(r'^add/',views.add,name="add"),
     url(r'^save_book/',views.save_book,name="save_book"),
+    url(r'^del_save/',views.del_save,name="del_save"),
     # url(r'^finish_order/',views.finish_order,name="finish_order"),
 
 ]

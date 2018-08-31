@@ -34,6 +34,7 @@ def check_name(request):
         # return render(request,'regist_login.html',{"error":"用户名已存在"})
     else:
         return HttpResponse(json.dumps({"success":"suc"}))
+
 def regist_in(request):
     # 1.判断是否为post是获取前端页面传来的信息否返回注册页面
     # 2.创建新的用户类
@@ -235,35 +236,53 @@ def add(request):
     # 3.从session中获取用户id
     # print(bookid)
     userid = request.session.get("id")
+    # print(bookid)
+    # print(userid)
     if not userid:
-        return redirect("/userinfo/login")
-    else:
+        # print("1")
+        # return redirect("/userinfo/login")
+        return HttpResponse(json.dumps({"success": "login"}))
+
     # 2.通过id查询商品
-        user = UserInfo.objects.get(id=userid)
-        book = Book.objects.get(id=bookid)
-        # 4.保存进数据库
-        #判断数据库这个人是否有这本书
-        s = Save.objects.filter(user_id=userid,book_id=bookid)
-        new_save = Save()
-        # check_book = s[0].objects.filter(book_id=bookid)
-        if len(s)>0:
-            return HttpResponse(json.dumps({"success": "again"}))
-        new_save.user = user
-        new_save.book = book
-        try:
-            new_save.save()
-        except DatabaseError as e:
-            logging.warning(e)
-        # 5.返回给ajax
-        return HttpResponse(json.dumps({"success":"suc"}))
+    user = UserInfo.objects.get(id=userid)
+    book = Book.objects.get(id=bookid)
+    # print(user)
+    # print(bookid)
+    # 4.保存进数据库
+    #判断数据库这个人是否有这本书
+    s = Save.objects.filter(user_id=userid,book_id=bookid)
+    new_save = Save()
+    # check_book = s[0].objects.filter(book_id=bookid)
+    if len(s)>0:
+        return HttpResponse(json.dumps({"success": "again"}))
+    new_save.user = user
+    new_save.book = book
+    try:
+        new_save.save()
+    except DatabaseError as e:
+        logging.warning(e)
+    # 5.返回给ajax
+    return HttpResponse(json.dumps({"success":"suc"}))
 
 def save_book(request):
     # 1.获取用户session中的id
     userid = request.session.get("id")
+    if not userid:
+        return redirect("/userinfo/login")
     save = Save.objects.filter(user_id=userid)
     # 2.通过userid获取用户所有的书
     #3.返回save页面
     return render(request,"save.html",locals())
+
+def del_save(request):
+    # user_id = request.session.get("id")
+    book_id = request.GET.get("book_id")
+    print(book_id)
+    try:
+        su = Save.objects.get(book_id=book_id).delete()
+        return HttpResponse(json.dumps({"static": "ok"}))
+    except DatabaseError as e:
+        logging.warning(e)
 
 @cache_page(30)
 def finish_order(request):

@@ -57,8 +57,11 @@
                     if (JSON.parse(data)["message"]=="success"){
 {#                        console.log(JSON.parse(data)["message"])#}
                         alert("添加成功")
-                    }else {
+                    }if (JSON.parse(data)["message"]=="error") {
                         document.write("商品已售完")
+
+                    }if (JSON.parse(data)["message"]=="login"){
+                        location.href="../userinfo/login";
                     }
 
                 },
@@ -77,8 +80,10 @@
                     if (JSON.parse(data)["success"]=="suc"){
 {#                        console.log(JSON.parse(data)["message"])#}
                         alert("添加成功")
-                    }else {
+                    }if (JSON.parse(data)["success"]=="again"){
                         alert("收藏夹已存在")
+                    }if (JSON.parse(data)["success"]=="login") {
+                        location.href='/userinfo/login/';
                     }
 
                 },

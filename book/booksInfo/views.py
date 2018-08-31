@@ -69,7 +69,13 @@ def show_detail(request):
     d_book = Book.objects.get(id=bookid)
     return render(request,"detail.html",locals())
 
-
+def search_book(request):
+    search_val = request.POST.get("search_val")
+    check_book = Book.objects.filter(bookname=search_val)
+    if len(check_book) <= 0 :
+        return HttpResponse(json.dumps({"message":"fail"}))
+    book_id = check_book[0].id
+    return HttpResponse(json.dumps({"message":book_id}))
 
 
 

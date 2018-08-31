@@ -22,10 +22,12 @@ def addcart(request):
     # 4.判断购物车中是否有这个商品有则累加
     # 无则添加数量
     # 5.保存数据库向前端页面返回一个success
-    userid = request.session["id"]
+    userid = request.session.get("id")
     bookid = request.POST.get("bookid")
     ccount = request.POST.get("bookunit")
-    old_user = UserInfo.objects.get(id=userid)
+    # print(bookid)
+    # print(ccount)
+    old_user = UserInfo.objects.filter(id=userid)
     # print(old_user)
     old_book = Book.objects.get(id=bookid)
     # print(old_book[0])
@@ -34,7 +36,7 @@ def addcart(request):
     check_cart = Cart.objects.filter(user_id=userid,book_id=bookid)
 
     if not userid:
-        return redirect("/userinfo/login")
+        return HttpResponse(json.dumps({"message": "login"}))
     else:
         if not bookid:
             return HttpResponse(json.dumps({"message":"error"}))
@@ -64,7 +66,7 @@ def addcart(request):
             # return render(request, "detail.html", json.dumps({"message":"success"}))
             try:
                 if len(check_cart) <= 0:
-                    new_cart.user = old_user
+                    new_cart.user = old_user[0]
                     new_cart.book = old_book
                     new_cart.ccount = int(ccount)
                     new_cart.save()

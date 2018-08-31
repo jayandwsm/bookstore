@@ -29,6 +29,7 @@
             <a href="{% url 'login' %}">登录</a>
             <a href="{% url 'regist' %}">注册</a>
         {% endif %}
+        <p><input type="text"><button onclick="search()">搜索</button></p>
 		<header id="fh5co-header" role="banner">
 			<div class="container text-center">
 				<div id="fh5co-logo">
@@ -51,30 +52,36 @@
                         <a href="{{ book.get_url }}">
                             <img src="{{ book.bookpicture }}" alt="">
                             <h2>{{ book.bookname }}</h2>
-
                         </a>
                     </div>
                 {% endfor %}
 			</div>
 			<!--END .fh5co-projects-feed-->
 		</div>
-{#        <script src="{% static 'js/jquery-1.11.3.js' %}"></script>#}
-{#        <script>#}
-{#            function showdetail(bookid){#}
-{#                $.ajax({#}
-{#                    url:"/detail/",#}
-{#                    data:{"bookid":bookid,"csrfmiddlewaretoken":"{{ csrf_token }}"},#}
-{#                    datatype:"json",#}
-{#                    type:"get",#}
-{#                    success:function (data) {#}
-{#                        console.log(data)#}
-{#                    },#}
-{#                    error:function (error) {#}
-{#                        console.log(error)#}
-{#                    },#}
-{#                });#}
-{#            }#}
-{#        </script>#}
+
+        <script src="{% static 'js/jquery-1.11.3.js' %}"></script>
+        <script>
+            function search(){
+                search_val = $("input").val()
+                console.log(search_val);
+                $.ajax({
+                    url:"/search/",
+                    data:{"search_val":search_val,"csrfmiddlewaretoken":"{{ csrf_token }}"},
+                    datatype:"json",
+                    type:"post",
+                    success:function (data) {
+                        if (JSON.parse(data).message == "fail"){
+                            alert("不存在")
+                        }else {
+                            location.href="/detail/?bookid="+JSON.parse(data).message
+                        }
+                    },
+                    error:function (error) {
+                        console.log(error)
+                    },
+                });
+            }
+        </script>
 {#	<!-- jQuery -->#}
 {#	<script src="{% static 'js/jquery.min.js' %}"></script>#}
 {#	<!-- Bootstrap -->#}
